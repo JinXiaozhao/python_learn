@@ -5,7 +5,7 @@ import random
 import pymongo
 import requests
 import sys
-
+from tkinter import *
 
 
 def get_mongodbmessage():
@@ -90,14 +90,131 @@ def get_weather(city_code):
     return  weather_text
 
 
+class Application(Frame):
+    def __init__(self, city,master=None):
+        self.city=city
+        
+        
+        Frame.__init__(self, master,bg='white')
+        self.width,self.height=self.master.maxsize()
+        self.choice_city = StringVar()
+        self.choice_city.set("上海")
+        self.choice_pro = StringVar()
+        self.choice_pro.set("上海")
+        self.pack(expand=YES,fill=BOTH)
+        self.window_init()
+        self.fm1()
+        self.fm2()
+        self.fm3()
+
+    
+    def window_init(self):
+        self.master.title('天气预报—中国天气网')
+        self.master.bg='white'
+        
+        #self.master.geometry("{}x{}".format(self.width, self.height))
+
+
+
+    def choice_text1(self):
+            self.choice_pro.set(self.choiceprovince.get(ACTIVE))
+            self.choicecity.delete(0,END)
+            for i,each in enumerate(self.city[self.choice_pro.get()].keys()):
+                self.choicecity.insert(END,each)
+                
+            #print(choice_pro)
+    def choice_text2(self):
+            self.choice_city.set(self.choicecity.get(ACTIVE))
+            self.city_weather.delete(0,END)
+            for i,each in enumerate(get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])):
+                self.city_weather.insert(END,each)
+            
+            #print(choice_city)
+        
+    def fm1(self):
+        self.fm1=Frame(self,bg='white')
+        self.fm1.pack(side='left',expand='no',fill='both',padx=5, pady=5)
+        
+        self.titleLabe1=Label(self.fm1,text="选择省份",fg = "white",bg='blue')
+        self.titleLabe1.pack(side='top',fill='x')
+
+        self.choicebutton1=Button(self.fm1,text='确定',command=self.choice_text1)
+        self.choicebutton1.pack(side='bottom', fill='x')
+
+        self.scrollbar1=Scrollbar(self.fm1)
+        self.scrollbar1.pack(side='right',fill='y')
+        
+        self.choiceprovince=Listbox(self.fm1,yscrollcommand=self.scrollbar1.set)
+        self.choiceprovince.pack(side='left',fill='y')
+        for i,each in enumerate(self.city.keys()):
+            self.choiceprovince.insert(END,each)   
+
+        
+
+    def fm2(self):
+        
+        self.fm2=Frame(self,bg='white')
+        self.fm2.pack(side='left',expand='no',fill='both',padx=5, pady=5)
+        
+        self.titleLabe2=Label(self.fm2,text="选择城市",fg = "white",bg='blue')
+        self.titleLabe2.pack(side='top',fill='x')
+
+        
+        self.label=Label(self.fm2,textvariable=self.choice_pro)
+        self.label.pack(fill='x')
+
+        
+        self.choicebutton2=Button(self.fm2,text='确定',command=self.choice_text2)
+        self.choicebutton2.pack(side='bottom', fill='x')
+
+        self.scrollbar2=Scrollbar(self.fm2)
+        self.scrollbar2.pack(side='right',fill='y')
+        
+        self.choicecity=Listbox(self.fm2,yscrollcommand=self.scrollbar2.set)
+        self.choicecity.pack(side='left',fill='y')
+        for i,each in enumerate(self.city[self.choice_pro.get()].keys()):
+                self.choicecity.insert(END,each)
+        
+        
+
+    def fm3(self):
+        self.fm3=Frame(self,bg='white')
+        self.fm3.pack(side='right',expand='yes',fill='both',padx=5, pady=5)
+        
+        self.titleLabe3=Label(self.fm3,text="城市天气预报（7日内）",fg = "white",bg='blue')
+        self.titleLabe3.pack(side='top',fill='x')
+
+        
+        self.labe2=Label(self.fm3,textvariable=self.choice_pro)
+        self.labe2.pack(side='top',fill='x')
+        self.labe3=Label(self.fm3,textvariable=self.choice_city)
+        self.labe3.pack(side='top',fill='x')
+
+        self.choicebutton3=Button(self.fm3,text='退出',command=self.quit)
+        self.choicebutton3.pack(side='bottom', fill='x')
+     
+        
+        self.scrollbar3=Scrollbar(self.fm3)
+        self.scrollbar3.pack(side='right', fill='y')
+        
+        self.city_weather=Listbox(self.fm3,yscrollcommand=self.scrollbar3.set)
+        self.city_weather.pack(side='left', expand='yes',fill='both')
+        for i,each in enumerate(get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])):
+                self.city_weather.insert(END,each)
+
+
 
 def city_weather():
     
     city = get_mongodbmessage()
+    app = Application(city)
+    app.mainloop()
+    
+    '''
     province_choice=g.choicebox('选择省份','天气查询',city.keys())
     city_choice = g.choicebox('选择城市','天气查询',city[province_choice].keys())
     g.textbox(city_choice+'七日内天气情况','天气查询',get_weather(city[province_choice][city_choice]))
-    
+    '''
     sys.exit()
 
 
