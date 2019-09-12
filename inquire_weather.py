@@ -86,7 +86,7 @@ def get_weather(city_code):
         wind_x = '//*[@id="7d"]/ul/li['+str(i)+']/p[3]/em/span/@title'
         wind_direct = selector.xpath(wind_x)
         win=set(wind_direct)
-        print(win)
+        
         if len(win)==2:
             weather_text.append('风向为：'+wind_direct[0]+'转'+wind_direct[-1]+'\n')
         else:
