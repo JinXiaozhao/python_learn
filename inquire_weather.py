@@ -1,4 +1,4 @@
-#每次只能查询一个城市，使用EasyGUI模块
+ #每次只能查询一个城市，使用EasyGUI模块
 import easygui as g
 from lxml import etree
 import random
@@ -8,32 +8,26 @@ import sys
 
 
 
-
 def get_mongodbmessage():
-
-    message = []
-    #打开mongo数据库
+    
+    message = {}
     client = pymongo.MongoClient('mongodb://localhost:27017')
-    # 打开集合test
     db = client.china_city
-    # 打开文档xiaoguya_message
-    collection = db.city_code
-    #导出文档中数据
+    collection = db.province
     for each in collection.find():
-        message.append(each)
-    #message = collection.find()
+        message[each['_id']]=each[each['_id']]
     return message
+
+
 
 def url_open(city_code):
 
     url = 'http://www.weather.com.cn/weather/'+city_code+'.shtml'
-    #伪造一个访问源地址Resquest Headers
     headers = {}
     '''head = {
         
         'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36'
         }'''
-
     user_agents = [
             
             'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11',
@@ -47,14 +41,10 @@ def url_open(city_code):
             ]
     agent=random.choice(user_agents)
     headers['User-Agent']=agent
-    #实例化Request对象
     req = requests.get(url=url,headers=headers)
-    
-    #将网址内容返回一个类文件
-    
     html = req.content.decode('utf-8')
-    
     return html
+
 
 
 def get_weather(city_code):
@@ -97,49 +87,22 @@ def get_weather(city_code):
         wind = selector.xpath(wind_y)
         weather_text.append('风力为：'+wind[0] +'\n')
     weather_text.append('*********************************\n')
-    
     return  weather_text
-    
-
-
 
 
 
 def city_weather():
-    a={}
-    b={}
-    city_code = get_mongodbmessage()
-    city=['上海','江苏','浙江','北京',
-          '天津','重庆','黑龙江省','吉林',
-          '辽宁','内蒙古','山西','河北',
-          '陕西','山东','新疆','西藏',
-          '青海','甘肃','宁夏','河南',
-          '湖北','安徽','福建','江西',
-          '湖南','贵州','四川','广东',
-          '云南','广西','海南','香港',
-          '澳门','台湾省']
-    for each in city:
-        c=[]
-        for i in city_code:
-            if each == i['省份']:
-                
-                b[i['城市名称']]=i['城市代码']
-                c.append(i['城市名称'])
-
-        a[each]=c
-    province_choice=g.choicebox('选择省份','天气查询',a.keys())
-    city_choice = g.choicebox('选择城市','天气查询',a[province_choice])
-    g.textbox(city_choice+'七日内天气情况','天气查询',get_weather(b[city_choice]))
+    
+    city = get_mongodbmessage()
+    province_choice=g.choicebox('选择省份','天气查询',city.keys())
+    city_choice = g.choicebox('选择城市','天气查询',city[province_choice].keys())
+    g.textbox(city_choice+'七日内天气情况','天气查询',get_weather(city[province_choice][city_choice]))
     
     sys.exit()
 
 
 
-
-
 if __name__=="__main__":
-
-
 
     city_weather()
     
