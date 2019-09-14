@@ -1,5 +1,6 @@
 #config
 image_adds="E:\python_file\yu.png"
+image_bg = "E:\python_file\sea.jpg"
 import pygame
 import sys
 from pygame.locals import*
@@ -13,13 +14,13 @@ def test_game1():
         pygame.init()
         #实例化帧率设置对象
         clock = pygame.time.Clock()
-        size = width,height = 600,600
+        size = width,height = 1024,681
         #速度，每次向左移动2个单位，向上移动1个单位
         speed = [2,1]
         #鱼头方向
         fish_head = 1
         #背景颜色RGB格式
-        bg = (255,255,255)
+        bg = pygame.image.load(image_bg)
         #创建窗口并设置窗口的大小，返回一个surface对象
         screen = pygame.display.set_mode(size)
         #设置窗口标题
@@ -70,7 +71,8 @@ def test_game1():
                         speed[1] = -speed[1]
                 
                 #填充背景
-                screen.fill(bg)
+                #screen.fill(bg)
+                screen.blit(bg,(0,0))
                 #更新图片位置
                 screen.blit(image_actor,position)
                 #更新界面
