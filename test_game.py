@@ -1,3 +1,5 @@
+#config
+image_adds="E:\python_file\yu.png"
 import pygame
 import sys
 def test_game1():
@@ -10,7 +12,7 @@ def test_game1():
 	clock = pygame.time.Clock()
 	size = width,height = 400,600
 	#速度，每次向左移动2个单位，向上移动1个单位
-	speed = [-2,1]
+	speed = [2,1]
 	#背景颜色RGB格式
 	bg = (255,255,255)
 	#创建窗口并设置窗口的大小，返回一个surface对象
@@ -19,7 +21,7 @@ def test_game1():
 	pygame.display.set_caption('pygame第一个测试游戏')
 
 	#加载图片,返回一个surface对象
-	image_actor = pygame.image.load("E:\python_file\gray_ball.png")
+	image_actor = pygame.image.load(image_adds)
 	#获得图片的位置矩形
 	position = image_actor.get_rect()
 	
