@@ -6,7 +6,8 @@ def test_game1():
 	
 	#初始化pygame
 	pygame.init()
-
+	#实例化帧率设置对象
+	clock = pygame.time.Clock()
 	size = width,height = 400,600
 	#速度，每次向左移动2个单位，向上移动1个单位
 	speed = [-2,1]
@@ -46,7 +47,8 @@ def test_game1():
 		pygame.display.flip()
 		#延迟10毫秒
 		pygame.time.delay(10)
-		
+		#设置帧率为1
+		clock.tick(30)
 if __name__=='__main__':
 
 	test_game1()
