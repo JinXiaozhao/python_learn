@@ -1,4 +1,4 @@
- #每次只能查询一个城市，使用EasyGUI模块
+
 import easygui as g
 from lxml import etree
 import random
