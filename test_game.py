@@ -5,7 +5,8 @@ import pygame
 import sys
 from pygame.locals import*
 
-
+        
+        
 
 #测试对象移动
 def test_game1():
@@ -14,15 +15,19 @@ def test_game1():
         pygame.init()
         #实例化帧率设置对象
         clock = pygame.time.Clock()
-        size = width,height = 1024,681
+        size = width,height = 500,500
         #速度，每次向左移动2个单位，向上移动1个单位
         speed = [2,1]
         #鱼头方向
         fish_head = 1
+        #全屏标志，默认为非全屏
+        fullscreen = False
         #背景颜色RGB格式
         bg = pygame.image.load(image_bg)
+        #bg = (255,255,255)
         #创建窗口并设置窗口的大小，返回一个surface对象
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size,RESIZABLE)
+        
         #设置窗口标题
         pygame.display.set_caption('pygame第一个测试游戏')
 
@@ -31,34 +36,61 @@ def test_game1():
         #获得图片的位置矩形
         position = image_actor.get_rect()
         
+        
         while True:
                 #检测是否点击关闭按钮，查看是否需要结束事件
                 for event in pygame.event.get():
                         if event.type == QUIT:
                                 sys.exit()
-                        elif event.type == KEYDOWN:
+                        #键盘输入     
+                        if event.type == KEYDOWN:
                                 if event.key == K_LEFT:
-                                        if fish_head<0:
-                                                speed = [-1,0]
-                                        else:
+                                        
+                                        if fish_head>0:
                                                 image_actor = pygame.transform.flip(image_actor,True,False)
                                                 fish_head = -fish_head
-                                                speed = [-1,0]
-                                elif event.key == K_RIGHT:
+                                        speed = [-1,0]
+                                if event.key == K_RIGHT:
                                         if fish_head<0:
                                                 image_actor = pygame.transform.flip(image_actor,True,False)
                                                 fish_head = -fish_head 
                                         speed =[1,0]
-                                elif event.key == K_UP:
+                                if event.key == K_UP:
                                         if fish_head>0:
                                                 fish_head = -fish_head
                                                 image_actor = pygame.transform.flip(image_actor,True,False)
                                         speed =[0,-1]
-                                elif event.key == K_DOWN:
+                                if event.key == K_DOWN:
                                         if fish_head>0:
                                                 fish_head = -fish_head
                                                 image_actor = pygame.transform.flip(image_actor,True,False)
                                         speed =[0,1]
+                                #全屏设置(F11)
+                                if event.key == K_F11:
+                                        fullscreen = not fullscreen
+                                        if fullscreen:
+                                                size_new = width,height = pygame.display.list_modes()[0]
+                                                position[0]=int((position[0]/screen.get_width())*size_new[0])
+                                                position[1]=int((position[1]/screen.get_height())*size_new[1])
+                                                screen = pygame.display.set_mode(size_new,FULLSCREEN)
+                                                
+                                        else:
+                                                size_new = width,height = 500,500
+                                                position[0]=int((position[0]/screen.get_width())*size_new[0])
+                                                position[1]=int((position[1]/screen.get_height())*size_new[1])
+                                                screen = pygame.display.set_mode(size_new,RESIZABLE)
+                                                
+                                
+                        #调整窗口大小
+                        if event.type == VIDEORESIZE:
+                                
+                                size_new = width,height = event.size
+                                position[0]=int((position[0]/screen.get_width())*size_new[0])
+                                position[1]=int((position[1]/screen.get_height())*size_new[1])
+                                screen = pygame.display.set_mode(size_new,RESIZABLE)
+                                
+                                
+                                        
                 
                 #移动主角图像
                 position = position.move(speed)
