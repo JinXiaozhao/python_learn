@@ -4,6 +4,7 @@ image_bg = "E:\python_file\sea.jpg"
 import pygame
 import sys
 from pygame.locals import*
+import math
 
 #基本图形绘制
 def test_figure():
@@ -16,7 +17,7 @@ def test_figure():
         RED = (255,0,0)
         BLUE = (0,0,255)
         
-        size = width,height = 600,600
+        size = width,height = 700,700
         screen = pygame.display.set_mode(size,RESIZABLE)
         pygame.display.set_caption('基本图形绘制测试')
 
@@ -24,31 +25,50 @@ def test_figure():
         pointlist1 = [(50,200),(100,200),(100,220),(100,250),(50,250),(50,220)]
         pointlist2 = [(150,200),(200,200),(200,220),(200,250),(150,250),(150,220)]
         pointlist3 = [(250,200),(300,200),(300,220),(300,250),(250,250),(250,220)]
-        pointlist4 = [(50,75),(150,25),(250,75),(300,25),(300,125),(250,75),(150,125)]
-
+        point1=(250,75)
+        pointlist4 = [(point1[0]-200,point1[1]),(point1[0]-100,point1[1]-50),point1,(point1[0]+50,point1[1]-50),(point1[0]+50,point1[1]+50),point1,(point1[0]-100,point1[1]+50)]
+        left_button_move = False
+        
         #圆形圆心位置
         position = (450,450)
+        right_button_move = False
+        
+        #椭圆中点位置
+        position1 = (175,350)
+        
+        #线段坐标
+        pointlist_line1 = [(500,60),(600,100),(650,60)]
+        pointlist_line2 = [(500,160),(600,200),(650,160)]
 
-        button_move = False
+        
         while True:
 
                 for event in pygame.event.get():
                         if event.type == QUIT:
                                 sys.exit()
 
-                        #使用鼠标控制圆形圆心的位置
+                        
                         if event.type == MOUSEBUTTONDOWN:
                                 if event.button ==1:
-                                        button_move = True
+                                        left_button_move = True
+                                if event.button == 3:
+                                        right_button_move = True
 
                         
                         if event.type == MOUSEBUTTONUP:
                                 if event.button == 1:
-                                        button_move = False
-
-                if button_move:
-                        position = pygame.mouse.get_pos()
+                                        left_button_move = False
+                                if event.button == 3:
+                                        right_button_move = False
                                         
+
+                #使用鼠标右键控制椭圆的位置
+                if right_button_move:
+                        position1 = pygame.mouse.get_pos()
+                #使用鼠标左键控制多边形某一点位置，从而移动多边形
+                if left_button_move:
+                        point1 = pygame.mouse.get_pos()
+                        pointlist4 = [(point1[0]-200,point1[1]),(point1[0]-100,point1[1]-50),point1,(point1[0]+50,point1[1]-50),(point1[0]+50,point1[1]+50),point1,(point1[0]-100,point1[1]+50)]               
                                         
                         
                 screen.fill(bg)
@@ -62,7 +82,7 @@ def test_figure():
                 pygame.draw.polygon(screen,BLACK,pointlist1,0)
                 pygame.draw.polygon(screen,BLACK,pointlist2,1)
                 pygame.draw.polygon(screen,BLACK,pointlist3,5)
-                pygame.draw.polygon(screen,RED,pointlist4,1)
+                pygame.draw.polygon(screen,RED,pointlist4,0)
 
                 #绘制圆形
                 pygame.draw.circle(screen,RED,position,25,1)
@@ -70,8 +90,21 @@ def test_figure():
                 pygame.draw.circle(screen,BLUE,position,100,1)
                 pygame.draw.circle(screen,BLACK,position,125,1)
                 
+                #绘制椭圆形
+                pygame.draw.ellipse(screen,RED,(position1[0]-150,position1[1]+50,300,100),1)
+                pygame.draw.ellipse(screen,RED,(position1[0]-100,position1[1],200,200),1)
+                #绘制弧线
+                pygame.draw.arc(screen,RED,(300,50,300,100),math.pi*1.5,math.pi*2,1)
+                #绘制线段
+                pygame.draw.line(screen,RED,(500,50),(500,100),1)
+                pygame.draw.lines(screen,RED,1,pointlist_line1,1)
+                pygame.draw.lines(screen,RED,0,pointlist_line2,1)
+
+                pygame.draw.aaline(screen,BLUE,(500,10),(600,60),1)
+                pygame.draw.aaline(screen,BLUE,(400,10),(500,60),0)
+                
                 pygame.display.flip()
-                clock.tick(40)
+                clock.tick(100)
 
 
                 
