@@ -3,6 +3,7 @@ import sys
 from pygame.locals import *
 import random
 import math
+import traceback
 
 #继承动画精灵类
 class Ball(pygame.sprite.Sprite):
@@ -47,14 +48,22 @@ def collide_check(item,target):
         
 def main():
     pygame.init()
+    pygame.mixer.init()
     
     #背景图片及小球图片存储位置
     ball_image = r"E:\python_file\gray_ball.png"
     bg_image = r"E:\python_file\xidian.jpg"
 
+    #背景音乐
+    pygame.mixer.music.load(r"E:\python_file\G.E.M.mp3")
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.play()
+
     #运行标志位
     runing = True
     BALL_NUM = 5
+    music_pause = False
+    left_button =False
 
     #界面尺寸
     bg_site = width,height = 1024,512
@@ -63,6 +72,14 @@ def main():
     pygame.display.set_caption('Play ball game')
     #为界面加载背景图片
     back_ground = pygame.image.load(bg_image).convert_alpha()
+
+    #加载音乐控制图片
+    pause_image = pygame.image.load(r"E:\python_file\pause.JPG").convert_alpha()
+    start_image = pygame.image.load(r"E:\python_file\start.jpg").convert_alpha()
+    pause_rect = pause_image.get_rect()
+    pause_rect.left,pause_rect.top = (width-pause_rect.width)//2,(height-pause_rect.height)//2
+    start_rect = start_image.get_rect()
+    start_rect.left,start_rect.top = (width-start_rect.width)//2,(height-start_rect.height)//2
 
     #小球对象列表
     balls=[]
@@ -93,13 +110,33 @@ def main():
         for event in pygame.event.get():
             #退出
             if event.type == QUIT:
+                pygame.quit()
                 sys.exit()
+            #空格键
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    music_pause = not music_pause
+
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1 and ((pause_rect.left+pause_rect.width)>=pygame.mouse.get_pos()[0]>=pause_rect.left\
+                                          and (pause_rect.top+pause_rect.height)>=pygame.mouse.get_pos()[1]>=pause_rect.top):
+                    left_button = not left_button
+
+            
 
 
 
 
 
         screen.blit(back_ground,(0,0))
+        
+            
+        if music_pause or (left_button):
+            screen.blit(pause_image,pause_rect)
+            pygame.mixer.music.pause()
+        else:
+            screen.blit(start_image,start_rect)
+            pygame.mixer.music.unpause()
         
         for each in balls:
             each.ball_move()
@@ -112,7 +149,9 @@ def main():
                 i.speed[0] = -i.speed[0]
                 i.speed[1] = -i.speed[1]
             group.add(i)
-
+            
+        
+        
         pygame.display.flip()
         clock.tick(30)
 
@@ -142,6 +181,7 @@ def play_music():
         for event in pygame.event.get():
 
             if event.type ==QUIT:
+                pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
@@ -162,4 +202,11 @@ def play_music():
         clock.tick(30)
 
 if __name__=="__main__":
-    play_music()
+    try:
+        main()
+    except SystemExit:
+        pass
+    except:
+        traceback.print_exc()
+        pygame.quit()
+        input()
