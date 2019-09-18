@@ -63,7 +63,7 @@ def main():
     runing = True
     BALL_NUM = 5
     music_pause = False
-    left_button =False
+    
 
     #界面尺寸
     bg_site = width,height = 1024,512
@@ -120,7 +120,7 @@ def main():
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1 and ((pause_rect.left+pause_rect.width)>=pygame.mouse.get_pos()[0]>=pause_rect.left\
                                           and (pause_rect.top+pause_rect.height)>=pygame.mouse.get_pos()[1]>=pause_rect.top):
-                    left_button = not left_button
+                    music_pause = not music_pause
 
             
 
@@ -131,7 +131,7 @@ def main():
         screen.blit(back_ground,(0,0))
         
             
-        if music_pause or (left_button):
+        if music_pause :
             screen.blit(pause_image,pause_rect)
             pygame.mixer.music.pause()
         else:
@@ -186,7 +186,10 @@ def play_music():
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     pause = not pause
-
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1 and ((pause_rect.left+pause_rect.width)>=pygame.mouse.get_pos()[0]>=pause_rect.left\
+                                          and (pause_rect.top+pause_rect.height)>=pygame.mouse.get_pos()[1]>=pause_rect.top):
+                    pause = not pause
 
         screen.fill((255,255,255))
 
