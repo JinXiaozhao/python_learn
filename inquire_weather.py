@@ -6,6 +6,7 @@ import pymongo
 import requests
 import sys
 from tkinter import *
+import traceback
 
 
 def get_mongodbmessage():
@@ -117,17 +118,17 @@ class Application(Frame):
 
 
     def choice_text1(self):
-            self.choice_pro.set(self.choiceprovince.get(ACTIVE))
-            self.choicecity.delete(0,END)
-            for i,each in enumerate(self.city[self.choice_pro.get()].keys()):
-                self.choicecity.insert(END,each)
+        self.choice_pro.set(self.choiceprovince.get(ACTIVE))
+        self.choicecity.delete(0,END)
+        for i,each in enumerate(self.city[self.choice_pro.get()].keys()):
+            self.choicecity.insert(END,each)
                 
             #print(choice_pro)
     def choice_text2(self):
-            self.choice_city.set(self.choicecity.get(ACTIVE))
-            self.city_weather.delete(0,END)
-            for i,each in enumerate(get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])):
-                self.city_weather.insert(END,each)
+        self.choice_city.set(self.choicecity.get(ACTIVE))
+        self.city_weather.delete(0,END)
+        for i,each in enumerate(get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])):
+            self.city_weather.insert(END,each)
             
             #print(choice_city)
         
@@ -147,7 +148,8 @@ class Application(Frame):
         self.choiceprovince=Listbox(self.fm1,yscrollcommand=self.scrollbar1.set)
         self.choiceprovince.pack(side='left',fill='y')
         for i,each in enumerate(self.city.keys()):
-            self.choiceprovince.insert(END,each)   
+            self.choiceprovince.insert(END,each)
+        self.scrollbar1.config(command=self.choiceprovince.yview)
 
         
 
@@ -174,7 +176,7 @@ class Application(Frame):
         self.choicecity.pack(side='left',fill='y')
         for i,each in enumerate(self.city[self.choice_pro.get()].keys()):
                 self.choicecity.insert(END,each)
-        
+        self.scrollbar2.config(command=self.choicecity.yview)
         
 
     def fm3(self):
@@ -201,7 +203,7 @@ class Application(Frame):
         self.city_weather.pack(side='left', expand='yes',fill='both')
         for i,each in enumerate(get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])):
                 self.city_weather.insert(END,each)
-
+        self.scrollbar3.config(command=self.city_weather.yview)
 
 
 def city_weather():
@@ -221,6 +223,11 @@ def city_weather():
 
 if __name__=="__main__":
 
-    city_weather()
-    
+    try:
+        city_weather()
+    except SystemExit:
+        pass
+    except:
+        traceback.print_exc()
+        input()
 
