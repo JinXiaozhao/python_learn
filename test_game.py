@@ -45,6 +45,7 @@ def test_figure():
 
                 for event in pygame.event.get():
                         if event.type == QUIT:
+                                pygame.quit()
                                 sys.exit()
 
                         
@@ -144,6 +145,7 @@ def test_game1():
                 #检测是否点击关闭按钮，查看是否需要结束事件
                 for event in pygame.event.get():
                         if event.type == QUIT:
+                                pygame.quit()
                                 sys.exit()
                         #键盘输入     
                         if event.type == KEYDOWN:
@@ -218,6 +220,12 @@ def test_game1():
                 #设置帧率为1
                 clock.tick(30)
 if __name__=='__main__':
-
-        #test_game1()
-        test_figure()
+        try:
+                #test_game1()
+                test_figure()
+        except SystemExit:
+                pass
+        except:
+                traceback.print_exc()
+                pygame.quit()
+                input()
