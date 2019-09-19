@@ -51,11 +51,11 @@ def main():
     pygame.mixer.init()
     
     #背景图片及小球图片存储位置
-    ball_image = r"E:\python_file\gray_ball.png"
-    bg_image = r"E:\python_file\xidian.jpg"
+    ball_image = r"E:\python_file\test\gray_ball.png"
+    bg_image = r"E:\python_file\test\xidian.jpg"
 
     #背景音乐
-    pygame.mixer.music.load(r"E:\python_file\G.E.M.mp3")
+    pygame.mixer.music.load(r"E:\python_file\test\G.E.M.mp3")
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
 
@@ -74,8 +74,8 @@ def main():
     back_ground = pygame.image.load(bg_image).convert_alpha()
 
     #加载音乐控制图片
-    pause_image = pygame.image.load(r"E:\python_file\pause.JPG").convert_alpha()
-    start_image = pygame.image.load(r"E:\python_file\start.jpg").convert_alpha()
+    pause_image = pygame.image.load(r"E:\python_file\test\pause.JPG").convert_alpha()
+    start_image = pygame.image.load(r"E:\python_file\test\start.jpg").convert_alpha()
     pause_rect = pause_image.get_rect()
     pause_rect.left,pause_rect.top = (width-pause_rect.width)//2,(height-pause_rect.height)//2
     start_rect = start_image.get_rect()
@@ -159,7 +159,7 @@ def play_music():
     pygame.init()
     pygame.mixer.init()
 
-    pygame.mixer.music.load(r"E:\python_file\G.E.M.mp3")
+    pygame.mixer.music.load(r"E:\python_file\test\G.E.M.mp3")
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
 
@@ -167,8 +167,8 @@ def play_music():
     screen = pygame.display.set_mode(bg_size)
     pygame.display.set_caption("泡沫播放器")
 
-    pause_image = pygame.image.load(r"E:\python_file\pause.JPG").convert_alpha()
-    start_image = pygame.image.load(r"E:\python_file\start.jpg").convert_alpha()
+    pause_image = pygame.image.load(r"E:\python_file\test\pause.JPG").convert_alpha()
+    start_image = pygame.image.load(r"E:\python_file\test\start.jpg").convert_alpha()
     pause_rect = pause_image.get_rect()
     pause_rect.left,pause_rect.top = (width-pause_rect.width)//2,(height-pause_rect.height)//2
     start_rect = start_image.get_rect()
