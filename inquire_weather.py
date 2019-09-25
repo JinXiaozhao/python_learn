@@ -1,26 +1,23 @@
 # config
 #my_sender = 'jin_xiaozhao@163.com'  # 发件人邮箱账号
 #my_pass = '109801jin'  # 发件人邮箱密码
-my_name = " "  # 发件人邮箱昵称
+#my_name = " "  # 发件人邮箱昵称
 # recipients = '2948308329@qq.com'  # 收件人邮箱账号
-re_name = ' '  # 收件人邮箱昵称
+#re_name = ' '  # 收件人邮箱昵称
 #mail_subject = "天气预报"  # 邮件的主题，也可以说是标题
-
+import pymongo
+import random
+import requests
 import time
+from lxml import etree
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
 from email.utils import formataddr
-import easygui as g
-from lxml import etree
-import random
-import pymongo
-import requests
-import sys
 from tkinter import *
 import traceback
 
+# 获取城市代码
 
 
 def get_mongodbmessage():
@@ -32,16 +29,13 @@ def get_mongodbmessage():
         message[each['_id']] = each[each['_id']]
     return message
 
+# 爬取城市天气网页
+
 
 def url_open(city_code):
     url = 'http://www.weather.com.cn/weather/' + city_code + '.shtml'
     headers = {}
-    '''head = {
-
-        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36'
-        }'''
     user_agents = [
-
         'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11',
         'Opera/9.25 (Windows NT 5.1; U; en)',
         'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
@@ -58,11 +52,11 @@ def url_open(city_code):
     except:
         time.sleep(1)
         req = requests.get(url=url, headers=headers)
-
     html = req.content.decode('utf-8')
     return html
 
 
+# 获取城市天气信息
 def get_weather(city_code):
     html = url_open(city_code)
     selector = etree.HTML(html)
@@ -106,212 +100,209 @@ def get_weather(city_code):
     return weather_text
 
 
-class App(Frame):
-    def __init__(self, city, master=None):
-        self.city = city
+# 发送天气邮件
+def mail(sender_mail, sender_key,
+         mail_title, recipients_mail,
+         weather_text, province, city):
 
+    my_sender = sender_mail
+    recipients = recipients_mail
+    my_pass = sender_key
+    mail_subject = mail_title
+
+    re_name = ' '
+    my_name = ' '
+    mail_text = province + ' ' + city + '\n' + ' '.join(weather_text)
+    print(mail_text)
+    ret = True
+    msg = MIMEMultipart()
+    main_text = MIMEText(mail_text, 'plain', 'utf-8')
+    msg.attach(main_text)
+    msg['From'] = formataddr([my_name, my_sender])
+    msg['To'] = formataddr([re_name, recipients])
+    msg['Subject'] = mail_subject
+
+    try:
+        server = smtplib.SMTP_SSL("smtp.163.com", 465)
+        server.login(my_sender, my_pass)
+        server.sendmail(my_sender, [recipients, ], msg.as_string())
+        server.quit()
+    except:
+        ret = False
+    return ret
+
+# 界面
+
+
+class App(Frame):
+    def __init__(self, city_list, master=None):
+        self.city_list = city_list
         Frame.__init__(self, master, bg='white')
-        self.width, self.height = self.master.maxsize()
-        self.weather = []
-        self.choice_city = StringVar()
-        self.choice_city.set("上海")
-        self.choice_pro = StringVar()
-        self.choice_pro.set("上海")
         self.pack(expand=YES, fill=BOTH)
-        self.window_init()
+        self.master.title('天气预报—中国天气网')
+        self.master.bg = 'white'
+        self.province = StringVar()
+        self.city = StringVar()
+        self.weather_text = []
         self.fm1()
         self.fm2()
         self.fm3()
         self.fm4()
 
+    def show_city(self):
 
+        self.city.set('')
 
-    def window_init(self):
-        self.master.title('天气预报—中国天气网')
-        self.master.bg = 'white'
-
-        # self.master.geometry("{}x{}".format(self.width, self.height))
-
-    def choice_text1(self):
-        self.choice_pro.set(self.choiceprovince.get(ACTIVE))
-        self.choicecity.delete(0, END)
-        for i, each in enumerate(self.city[self.choice_pro.get()].keys()):
-            self.choicecity.insert(END, each)
-
-
-
-    def choice_text2(self):
-        self.choice_city.set(self.choicecity.get(ACTIVE))
+        self.weather_text.clear()
         self.city_weather.delete(0, END)
-        self.weather.clear()
-        self.weather = get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])
-        for i, each in enumerate(self.weather):
+        for each in self.weather_text:
             self.city_weather.insert(END, each)
 
+        self.province.set(self.choice_province.get(ACTIVE))
+        self.choice_city.delete(0, END)
+        for each in self.city_list[self.province.get()].keys():
+            self.choice_city.insert(END, each)
 
+    def show_weather(self):
+
+        self.city.set(self.choice_city.get(ACTIVE))
+
+        self.city_weather.delete(0, END)
+        self.weather_text.clear()
+        self.weather_text = get_weather(self.city_list[self.province.get()][self.city.get()])
+        for each in self.weather_text:
+            self.city_weather.insert(END, each)
 
     def fm1(self):
-        self.fma = Frame(self, bg='white')
-        self.fma.pack(side='left', expand='no', fill='both', padx=5, pady=5)
+        fma = Frame(self)
+        fma.pack(side='left', expand='no', fill='both', padx=5, pady=5)
 
-        self.titleLabe1 = Label(self.fma, text="选择省份", fg="white", bg='blue')
-        self.titleLabe1.pack(side='top', fill='x')
+        label_title = Label(fma, text='选择省份', fg="white", bg='blue')
+        label_title.pack(side='top', fill='x', padx=5, pady=5)
 
-        self.choicebutton1 = Button(self.fma, text='确定', command=self.choice_text1)
-        self.choicebutton1.pack(side='bottom', fill='x')
+        choice_button = Button(fma, text='确定', command=self.show_city)
+        choice_button.pack(side='bottom', fill='x', padx=5, pady=5)
 
-        self.scrollbar1 = Scrollbar(self.fma)
-        self.scrollbar1.pack(side='right', fill='y')
+        scrollbar = Scrollbar(fma)
+        scrollbar.pack(side='right', fill='y')
 
-        self.choiceprovince = Listbox(self.fma, yscrollcommand=self.scrollbar1.set)
-        self.choiceprovince.pack(side='left', fill='y')
-        for i, each in enumerate(self.city.keys()):
-            self.choiceprovince.insert(END, each)
-        self.scrollbar1.config(command=self.choiceprovince.yview)
+        self.choice_province = Listbox(fma, yscrollcommand=scrollbar.set)
+        self.choice_province.pack(side='left', fill='y')
+
+        for i, each in enumerate(self.city_list.keys()):
+            self.choice_province.insert(END, each)
+        scrollbar.config(command=self.choice_province.yview)
 
     def fm2(self):
+        fmb = Frame(self)
+        fmb.pack(side='left', expand='no', fill='both', padx=5, pady=5)
 
-        self.fmb = Frame(self, bg='white')
-        self.fmb.pack(side='left', expand='no', fill='both', padx=5, pady=5)
+        label_title = Label(fmb, text='选择城市', fg="white", bg='blue')
+        label_title.pack(side='top', fill='x', padx=5, pady=5)
 
-        self.titleLabe2 = Label(self.fmb, text="选择城市", fg="white", bg='blue')
-        self.titleLabe2.pack(side='top', fill='x')
+        label_province = Label(fmb, textvariable=self.province).pack(side='top', fill='x')
 
-        self.label = Label(self.fmb, textvariable=self.choice_pro)
-        self.label.pack(fill='x')
+        choice_button = Button(fmb, text='确定', command=self.show_weather)
+        choice_button.pack(side='bottom', fill='x', padx=5, pady=5)
 
-        self.choicebutton2 = Button(self.fmb, text='确定', command=self.choice_text2)
-        self.choicebutton2.pack(side='bottom', fill='x')
+        scrollbar = Scrollbar(fmb)
+        scrollbar.pack(side='right', fill='y')
 
-        self.scrollbar2 = Scrollbar(self.fmb)
-        self.scrollbar2.pack(side='right', fill='y')
+        self.choice_city = Listbox(fmb, yscrollcommand=scrollbar.set)
+        self.choice_city.pack(side='left', fill='y')
 
-        self.choicecity = Listbox(self.fmb, yscrollcommand=self.scrollbar2.set)
-        self.choicecity.pack(side='left', fill='y')
-        for i, each in enumerate(self.city[self.choice_pro.get()].keys()):
-            self.choicecity.insert(END, each)
-        self.scrollbar2.config(command=self.choicecity.yview)
+        if self.province.get():
+            for each in self.city_list[self.province.get()].keys():
+                self.choice_city.insert(END, each)
+        scrollbar.config(command=self.choice_city.yview)
 
     def fm3(self):
-        self.fmc = Frame(self, bg='white')
-        self.fmc.pack(side='left', expand='no', fill='both', padx=5, pady=5)
+        fma = Frame(self)
+        fma.pack(side='left', expand='no', fill='both', padx=5, pady=5)
 
-        self.titleLabe3 = Label(self.fmc, text="城市天气预报（7日内）", fg="white", bg='blue')
-        self.titleLabe3.pack(side='top', fill='x')
+        label_title = Label(fma, text='天气预报（7日内）', fg="white", bg='blue')
+        label_title.pack(side='top', fill='x', padx=5, pady=5)
 
-        self.labe2 = Label(self.fmc, textvariable=self.choice_pro)
-        self.labe2.pack(side='top', fill='x')
-        self.labe3 = Label(self.fmc, textvariable=self.choice_city)
-        self.labe3.pack(side='top', fill='x')
+        label_province = Label(fma, textvariable=self.province).pack(side='top')
+        label_city = Label(fma, textvariable=self.city).pack(side='top')
 
-        self.choicebutton3 = Button(self.fmc, text='退出', command=self.quit)
-        self.choicebutton3.pack(side='bottom', fill='x')
+        choice_button = Button(fma, text='退出系统', command=self.quit)
+        choice_button.pack(side='bottom', fill='x', padx=5, pady=5)
 
-        self.scrollbar3 = Scrollbar(self.fmc)
-        self.scrollbar3.pack(side='right', fill='y')
+        scrollbar = Scrollbar(fma)
+        scrollbar.pack(side='right', fill='y')
 
-        self.city_weather = Listbox(self.fmc, yscrollcommand=self.scrollbar3.set)
-        self.city_weather.pack(side='left', expand='yes', fill='both')
+        self.city_weather = Listbox(fma, yscrollcommand=scrollbar.set)
+        self.city_weather.pack(side='left', expand='yes', fill='y')
 
-        self.weather = get_weather(self.city[self.choice_pro.get()][self.choice_city.get()])
-        for i, each in enumerate(self.weather):
+        if self.province.get() and self.city.get():
+            self.weather_text = get_weather(self.city_list[self.province.get()][self.city.get()])
+        else:
+            self.weather_text.clear()
+        for each in self.weather_text:
             self.city_weather.insert(END, each)
-        self.scrollbar3.config(command=self.city_weather.yview)
-
+        scrollbar.config(command=self.city_weather.yview)
 
     def fm4(self):
 
-        def mail():
-
-            var_result.set('正在发送……')
-            my_sender = var_send.get()
-            recipients = var_post.get()
-            my_pass = var_send_key.get()
-            mail_subject = var_title.get()
-
-
-            mail_text = self.choice_pro.get() + ' ' + \
-                        self.choice_city.get()+'\n' + \
-                        ' '.join(self.weather)
-            
-            ret = True
-            msg = MIMEMultipart()
-            main_text = MIMEText(mail_text, 'plain', 'utf-8')
-            msg.attach(main_text)
-            msg['From'] = formataddr([my_name, my_sender])
-            msg['To'] = formataddr([re_name, recipients])
-            msg['Subject'] = mail_subject
-
-            try:
-                server = smtplib.SMTP_SSL("smtp.163.com", 465)
-                server.login(my_sender, my_pass)
-                server.sendmail(my_sender, [recipients, ], msg.as_string())
-                server.quit()
-            except:
-                ret = False
+        def send_email():
+            ret = mail(sender_mail.get(), sender_key.get(),
+                       mail_title.get(), recipients_mail.get(),
+                       self.weather_text, self.province.get(), self.city.get())
             if ret:
                 var_result.set('发送成功！')
-
-
             else:
                 var_result.set('发送失败！')
 
-        self.fmd = Frame(self, bg='white')
-        self.fmd.pack(side='right', expand='yes', fill='both', padx=5, pady=5)
+        fma = Frame(self)
+        fma.pack(side='left', expand='no', fill='both', padx=5, pady=5)
 
-        self.titleLabe4 = Label(self.fmd, text="天气预报邮件发送", fg="white", bg='blue')
-        self.titleLabe4.pack(side='top', fill='x')
+        label_title = Label(fma, text='天气情况邮件发送', fg="white", bg='blue')
+        label_title.pack(side='top', fill='x', padx=5, pady=5)
 
-        self.labe4 = Label(self.fmd, text='发件人邮箱：\n(仅支持网易163邮箱)')
-        self.labe4.pack(side='top', fill='x')
-        var_send = StringVar()
-        self.mail_send = Entry(self.fmd, textvariable=var_send)
-        self.mail_send.pack(side='top', fill='x')
+        label_sender = Label(fma, text='寄件人邮箱：\n（仅限网易163邮箱）')\
+            .pack(side='top', fill='x')
+        sender_mail = StringVar()
+        sender = Entry(fma, textvariable=sender_mail)
+        sender.pack(side='top', fill='x')
 
-        self.labe6 = Label(self.fmd, text='发件人邮箱密码：')
-        self.labe6.pack(side='top', fill='x')
-        var_send_key = StringVar()
-        self.mail_send_key = Entry(self.fmd, textvariable=var_send_key, show='*')
-        self.mail_send_key.pack(side='top', fill='x')
+        label_sender_key = Label(fma, text='邮箱密码：')\
+            .pack(side='top', fill='x')
+        sender_key = StringVar()
+        sender_pass = Entry(fma, textvariable=sender_key, show='*')
+        sender_pass.pack(side='top', fill='x')
 
+        label_mail_title = Label(fma, text='邮件主题：') \
+            .pack(side='top', fill='x')
+        mail_title = StringVar()
+        input_mail_title = Entry(fma, textvariable=mail_title)
+        input_mail_title.pack(side='top', fill='x')
 
-        self.labe5 = Label(self.fmd, text='收件人邮箱：')
-        self.labe5.pack(side='top', fill='x')
-        var_post = StringVar()
-        self.mail_post = Entry(self.fmd, textvariable=var_post)
-        self.mail_post.pack(side='top', fill='x')
-
-
-        self.labe7 = Label(self.fmd, text='邮件主题')
-        self.labe7.pack(side='top', fill='x')
-        var_title = StringVar()
-        self.mail_title = Entry(self.fmd, textvariable=var_title)
-        self.mail_title.pack(side='top', fill='x')
-
+        label_recipients = Label(fma, text='收件人邮箱：')\
+            .pack(side='top', fill='x')
+        recipients_mail = StringVar()
+        recipients = Entry(fma, textvariable=recipients_mail)
+        recipients.pack(side='top', fill='x')
 
         var_result = StringVar()
-        self.labe8 = Label(self.fmd, textvariable=var_result)
-        self.labe8.pack(side='top', fill='x')
+        label_result = Label(fma, textvariable=var_result, fg="white", bg='blue') \
+            .pack(side='top', fill='x')
+
+        choice_button = Button(fma, text='发送', command=send_email)
+        choice_button.pack(side='bottom', fill='x', padx=5, pady=5)
 
 
-        self.choicebutton4 = Button(self.fmd, text='发送', command=mail)
-        self.choicebutton4.pack(side='top', fill='x')
-        var_result.set('等待中……')
-
-def city_weather():
-    city = get_mongodbmessage()
-    app = App(city)
+def weather_main():
+    city_list = get_mongodbmessage()
+    app = App(city_list)
     app.mainloop()
-    sys.exit()
 
 
-if __name__ == "__main__":
-
+if __name__ == '__main__':
     try:
-        city_weather()
+        weather_main()
     except SystemExit:
         pass
     except:
         traceback.print_exc()
         input()
-
