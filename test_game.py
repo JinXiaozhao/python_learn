@@ -219,10 +219,62 @@ def test_game1():
                 pygame.time.delay(10)
                 #设置帧率为1
                 clock.tick(30)
+def play_music():
+    pygame.init()
+    pygame.mixer.init()
+
+    pygame.mixer.music.load(r"E:\python_file\ballgame\G.E.M.mp3")
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.play()
+
+    bg_size = width, height = 300, 200
+    screen = pygame.display.set_mode(bg_size)
+    pygame.display.set_caption("泡沫播放器")
+
+    pause_image = pygame.image.load(r"E:\python_file\ballgame\pause.JPG").convert_alpha()
+    start_image = pygame.image.load(r"E:\python_file\ballgame\start.jpg").convert_alpha()
+    pause_rect = pause_image.get_rect()
+    pause_rect.left, pause_rect.top = (width - pause_rect.width) // 2, (height - pause_rect.height) // 2
+    start_rect = start_image.get_rect()
+    start_rect.left, start_rect.top = (width - start_rect.width) // 2, (height - start_rect.height) // 2
+    clock = pygame.time.Clock()
+    pause = False
+
+    while True:
+
+        for event in pygame.event.get():
+
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    pause = not pause
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1 and (
+                        (pause_rect.left + pause_rect.width) >= pygame.mouse.get_pos()[0] >= pause_rect.left \
+                        and (pause_rect.top + pause_rect.height) >= pygame.mouse.get_pos()[1] >= pause_rect.top):
+                    pause = not pause
+
+        screen.fill((255, 255, 255))
+
+        if pause:
+            screen.blit(pause_image, pause_rect)
+            pygame.mixer.music.pause()
+        else:
+            screen.blit(start_image, start_rect)
+            pygame.mixer.music.unpause()
+
+        pygame.display.flip()
+
+        clock.tick(30)
+
+
 if __name__=='__main__':
         try:
                 #test_game1()
-                test_figure()
+                #test_figure()
+                play_music()
         except SystemExit:
                 pass
         except:
