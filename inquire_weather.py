@@ -1,6 +1,6 @@
 # config
 #my_sender = 'jin_xiaozhao@163.com'  # 发件人邮箱账号
-#my_pass = '109801jin'  # 发件人邮箱密码
+#my_pass = ''  # 发件人邮箱密码
 #my_name = " "  # 发件人邮箱昵称
 # recipients = '2948308329@qq.com'  # 收件人邮箱账号
 #re_name = ' '  # 收件人邮箱昵称
