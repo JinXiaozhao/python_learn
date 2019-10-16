@@ -1,8 +1,8 @@
 # config
-#my_sender = 'jin_xiaozhao@163.com'  # 发件人邮箱账号
+#my_sender = ''  # 发件人邮箱账号
 #my_pass = ''  # 发件人邮箱密码
 #my_name = " "  # 发件人邮箱昵称
-# recipients = '2948308329@qq.com'  # 收件人邮箱账号
+# recipients = ''  # 收件人邮箱账号
 #re_name = ' '  # 收件人邮箱昵称
 #mail_subject = "天气预报"  # 邮件的主题，也可以说是标题
 import pymongo
