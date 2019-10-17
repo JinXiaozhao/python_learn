@@ -111,21 +111,25 @@ class LinkList(object):
         return
 
     def swap(self,m,n):
-        if m <= 0 and n <= 0 and m==n and m>self.length\
-           and n>self.length:
+        if m <= 0 or n <= 0 or m==n or m>self.length\
+           or n>self.length:
             raise Exception('wrong position!')
         if m>n:
             x=m
             m=n
             n=x
-        p = self.head
-        for i in range(1,m-1):
+        new_head = ListNode(-1)
+        new_head.next = self.head
+        p = new_head
+        for i in range(m-1):
             p = p.next
         tmp = p
         for i in range(m-1,n-1):
             p = p.next
+        
         tmp.next,p.next = p.next,tmp.next
-        p.next.next , tmp.next.next = tmp.next.next,p.next.next
+        tmp.next.next,p.next.next = p.next.next,tmp.next.next
+        self.head = new_head.next
         return
         
                 
@@ -149,7 +153,7 @@ if __name__=='__main__':
     x.reverse
     x.show
     print('将第2个元素与第6个元素交换位置')
-    x.swap(2,6)
+    x.swap(3,2)
     x.show
     
         
