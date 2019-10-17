@@ -18,7 +18,18 @@ class ListNode(object):
 class Solution:
     
     #2.merge two ordered link_list
-    
+    def merge2link_list(self,head1,head2):
+        if head1 == None:
+            return head2
+        if head2 == None:
+            return head1
+        if head1.head <= head2.head:
+            head1.next = Solution.merge2link_list(self,head1.next,head2)
+            return head1
+        else:
+            head2.next = Solution.merge2link_list(self,head2.next,head1)
+            return head2
+        
     #1.find k th to tail
     def find_K(self,head,k):
         p = head
@@ -34,27 +45,53 @@ class Solution:
             q = q.next
         return q
     
-if __name__=='__main__':
-    
-    #生成一个链表x
-    x = ListNode(5)
-    p = x
-    for i in range(5):
-        p.next = ListNode(i)
-        p = p.next
-    
-    #遍历输出链表x
-    q = x
+def show(head):
+    q = head
     while q:
         print(q.head,end=',')
         q = q.next
     print('over!')
     
+if __name__=='__main__':
+
+    #测试题目2
+    print('----------------------------------')
+    #生成一个链表x
+    x = ListNode(0)
+    p = x
+    for i in [1,5,8,40,45,55]:
+        p.next = ListNode(i)
+        p = p.next
+    #生成一个链表z
+    z = ListNode(5)
+    p = z
+    for i in range(6,11):
+        p.next = ListNode(i)
+        p = p.next
+    
+    #遍历输出链表
+    print('第一个链表为：')
+    show(x)
+    print('第二个链表为：')
+    show(z)
     y = Solution()
+    res2 = y.merge2link_list(x,z)
+    print('合并后链表为：')
+    show(res2)
     
     #测试题目1函数
-    res = y.find_K(x,2)
-    print('倒数第2个元素为：{}'.format(res.head))
+    print('----------------------------------')
+    #生成一个链表x
+    x = ListNode(0)
+    p = x
+    for i in range(5):
+        p.next = ListNode(i)
+        p = p.next
+    print('链表为：')
+    show(x)
+    y = Solution()
+    res1 = y.find_K(x,2)
+    print('倒数第2个元素为：{}'.format(res1.head))
 
     
     
