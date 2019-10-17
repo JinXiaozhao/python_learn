@@ -1,4 +1,6 @@
-这是一个说明文件。
+对本项目的文件的结构进行说明。
+data_structure文件夹中存放数据结构与算法的练习代码。
+pygame_test文件夹中存放python小游戏练习代码。
 inquiry_weather.py是一个天气查询的小代码；界面由easygui模块或tkinter模块实现；天气数据来源于中国天气网，使用爬虫实时爬取网址。（仅供学习参考）
 test_game.py是一个练习pygame模块的小代码。
 test_gameball.py是一个练习动画精灵和pygame模块的小代码。
